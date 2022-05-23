@@ -29,8 +29,10 @@ class Bank
     void Set_new_latest_pay();
     void Remove();
     void End();
+    void Pas_change();
     bool Accout_checker();
     bool Logining();
+    
 public:
     Bank()
     {
@@ -70,6 +72,8 @@ public:
             {
                 ofstream set(username + ".txt");
 
+                Blocker();
+
                 set << password << "\n";
                 set << credit << "\n";
                 set << latest_pay << "\n";
@@ -101,9 +105,10 @@ void Bank::Accout_creater()
     std::time_t t = std::time(0);
     std::tm* now = std::localtime(&t);
 
+    cout << "Введите пароль, который вы хотели бы установить\n";
     for (bool i = 1; i == 1;)
     {
-        cout << "Введите пароль, который вы хотели бы установить\n";
+        
         cin >> password;
 
         if (password != "BLOCK")
@@ -127,47 +132,37 @@ void Bank::Accout_creater()
         }
     } while (cn);
 
-    if((now->tm_mday < 10)&&(now->tm_mon < 10))
+    create << password << "\n";
+    create << credit << "\n";
+    if((now->tm_mday < 10)&&(now->tm_mon+1 < 10))
     {
-        create << password << "\n";
-        create << credit << "\n";
-        create << (now->tm_year + 1900) << '.0'
-            << (now->tm_mon + 1) << '.0'
+        create << (now->tm_year + 1900) << ".0"
+            << (now->tm_mon + 1) << ".0"
             << now->tm_mday
             << "\n";
-        create << "10\n";
     }
     else if (now->tm_mday < 10)
     {
-        create << password << "\n";
-        create << credit << "\n";
         create << (now->tm_year + 1900) << '.'
-            << (now->tm_mon + 1) << '.0'
+            << (now->tm_mon + 1) << ".0"
             << now->tm_mday
             << "\n";
-        create << "10\n";
     }
-    else if (now->tm_mon < 10)
+    else if (now->tm_mon + 1 < 10)
     {
-        create << password << "\n";
-        create << credit << "\n";
-        create << (now->tm_year + 1900) << '.0'
+        create << (now->tm_year + 1900) << ".0"
             << (now->tm_mon + 1) << '.'
             << now->tm_mday
             << "\n";
-        create << "10\n";
     }
     else
     {
-        create << password << "\n";
-        create << credit << "\n";
         create << (now->tm_year + 1900) << '.'
             << (now->tm_mon + 1) << '.'
             << now->tm_mday
             << "\n";
-        create << "10\n";
     }
-    
+    create << "10\n";
 
     create.close();
 }
@@ -190,6 +185,7 @@ void Bank::Get_info()
 void Bank::Blocker()
 {
     password = "BLOCK";
+
 }
 void Bank::Percent()
 {
@@ -288,13 +284,30 @@ void Bank::Pay()
     string confirm;
 
     cout << "Введите сумму платежа, которую хоте бы внести.\n";
-    cin >> pay;
+    
+    bool cn;
+        do
+        {
+            cn = 0;
+            cin >> pay;
+            if (!cin)
+            {
+                cn = 1;
+                cin.clear();
+                cin.ignore(100, '\n');
+                cout << "Введите целое ЧИСЛО. Если Вы не хотите платить, то введите '0'\n";
+            }
+        } while (cn);
 
     cout << "Код подтверждения от администратора:.\n";
     cin >> confirm;
+    if (confirm == "stop")
+        End();
+
     if (confirm == admin_code)
     {
         credit -= pay;
+        Lchance = 10;
         Set_new_latest_pay();
         cout << "Отлично. Платёж выполнен успешно.\n";
     }
@@ -305,29 +318,29 @@ void Bank::Set_new_latest_pay()
 {
     std::time_t t = std::time(0);
     std::tm* now = std::localtime(&t);
-    if ((now->tm_mday < 10) && (now->tm_mon < 10))
+    if ((now->tm_mday < 10) && (now->tm_mon + 1 < 10))
     {
-        latest_pay = (now->tm_year + 1900) + '.0'
-            + (now->tm_mon + 1) + '.0'
-            + now->tm_mday;
+        latest_pay = to_string(now->tm_year + 1900) + ".0"
+            + to_string(now->tm_mon + 1) + ".0"
+            + to_string(now->tm_mday);
     }
     else if (now->tm_mday < 10)
     {
-        latest_pay = (now->tm_year + 1900) + '.'
-            + (now->tm_mon + 1) + '.0'
-            + now->tm_mday;
+        latest_pay = to_string(now->tm_year + 1900) + '.'
+            + to_string(now->tm_mon + 1) + ".0"
+            + to_string(now->tm_mday);
     }
     else if (now->tm_mon < 10)
     {
-        latest_pay = (now->tm_year + 1900) + '.0'
-            + (now->tm_mon + 1) + '.'
-            + now->tm_mday;
+        latest_pay = to_string(now->tm_year + 1900) + ".0"
+            + to_string(now->tm_mon + 1) + "."
+            + to_string(now->tm_mday);
     }
     else
     {
-        latest_pay = (now->tm_year + 1900) + '.'
-            + (now->tm_mon + 1) + '.'
-            + now->tm_mday;
+        latest_pay = to_string(now->tm_year + 1900) + '.'
+            + to_string(now->tm_mon + 1) + '.'
+            + to_string(now->tm_mday);
     }
     
 }
@@ -341,25 +354,55 @@ void Bank::End()
     ofstream reset(username + ".txt", ios_base::trunc);
     reset << password << "\n";
     reset << credit << "\n";
-    reset << latest_pay;
+    reset << latest_pay << "\n";
     reset << Lchance;
 
     reset.close();
 }
+void Bank::Pas_change()
+{
+    cout << "Введите новый пароль для аккаунта.\n";
+    for (bool i = 1; i == 1;)
+    {
+        cin >> password;
+
+        if (password != "BLOCK")
+            i = 0;
+        else
+            cout << "Введите другой пароль\n";
+    }
+}
 bool Bank::Logining()
 {
     string log_try;
-    cout << "Введите пароль к вашему аккаунту\n";
-    cin >> log_try;
-
-    if ((log_try == admin_code)||(log_try == password))
-        return 1;
+    if (password != "BLOCK")
+    {
+        cout << "Введите пароль к вашему аккаунту\n";
+        cin >> log_try;
+        if ((log_try == admin_code) || (log_try == password))
+            return 1;
+        else
+        {
+            cout << "Ошибка!.\n";
+            if (Lchance == 2 )
+                cout << "У вас осталась одна попытка для ввода пароля.\n";
+            return 0;
+        }
+    }
     else
     {
-        cout << "Ошибка!.\n";
-        if (Lchance == 1)
-            cout << "У вас осталась одна попытка для ввода пароля.\n";
-        return 0;
+        cout << "Ваш аккаунт заблокирован. Для восстановления аккаунта введите пароль администратора.\n";
+        cin >> log_try;
+        if ((log_try == admin_code))
+        {
+            Pas_change();
+            return 1;
+        }  
+        else
+        {
+            cout << "Ошибка!.\n";
+            return 0;
+        }
     }
 }
 
