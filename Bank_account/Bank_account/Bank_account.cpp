@@ -19,7 +19,7 @@ class Bank
     string username;
     string password;
     string latest_pay;
-    const string admin_code = "5456AdmCode";
+    const string admin_code = "AdmCode";
 
     void Accout_creater();
     void Percent();
