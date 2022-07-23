@@ -14,7 +14,7 @@ class Bank
 {
     bool blocking = false;
     const int percent = 5;
-    int credit;
+    unsigned int credit;
     int Lchance;
     string username;
     string password;
@@ -280,7 +280,7 @@ void Bank::Percent()
 }
 void Bank::Pay()
 {
-    int pay;
+    unsigned int pay;
     string confirm;
 
     cout << "Введите сумму платежа, которую хоте бы внести.\n";
