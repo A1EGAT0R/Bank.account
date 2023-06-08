@@ -36,7 +36,7 @@ class Bank
 public:
     Bank()
     {
-        cout << "Здравствуйте. Для начала работы введите ваш login?\n";
+        cout << "Здравствуйте. Для начала работы введите ваш login\n";
         cin >> username;
         if (Accout_checker())
         {
